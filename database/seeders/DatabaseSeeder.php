@@ -32,7 +32,7 @@ class DatabaseSeeder extends Seeder
         $guruWalas = $gurus->random(3);
 
         // buat kbm
-        kbm::factory(5)->create();
+        kbm::factory(20)->create();
 
         // Jenjang & kelas fix
         $jenjangs = ['X', 'XI', 'XII'];

@@ -36,8 +36,8 @@
 <div class="row mb-8">
     <div class="col-12">
         <div class="text-center mb-8">
-            <h2 style="color: var(--gray-800); margin-bottom: var(--spacing-3);">Fitur Unggulan</h2>
-            <p class="text-muted" style="font-size: var(--font-size-lg); max-width: 500px; margin: 0 auto;">
+            <h2 style="color: var(--gray-800); margin-bottom: var(--spacing-5);">Fitur Unggulan</h2>
+            <p class="text-muted" style="font-size: var(--font-size-lg); max-width: 500px; margin: 0 auto; margin-bottom: var(--spacing-5);">
                 Kelola seluruh aspek sekolah dalam satu platform yang terintegrasi
             </p>
         </div>
@@ -100,7 +100,7 @@
     <div class="col-12">
         <div class="text-center mb-8">
             <h2 style="color: var(--gray-800); margin-bottom: var(--spacing-3);">Artikel & Berita Terbaru</h2>
-            <p class="text-muted" style="font-size: var(--font-size-lg); max-width: 500px; margin: 0 auto;">
+            <p class="text-muted" style="font-size: var(--font-size-lg); max-width: 500px; margin: 0 auto; margin-bottom: var(--spacing-5);">
                 Dapatkan informasi terkini seputar pendidikan dan pengumuman penting
             </p>
         </div>

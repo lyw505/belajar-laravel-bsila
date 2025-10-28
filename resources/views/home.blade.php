@@ -20,7 +20,7 @@
                         </p>
                     </div>
                     <div class="d-flex gap-3">
-                        @if(session('admin_role') === 'guru' || session('admin_role') === 'admin')
+                        @if(session('admin_role') === 'guru' || session('admin_role') === 'admin' || session('admin_role') === 'siswa')
                             <a href="{{ route('jadwal.index') }}" class="btn btn-outline">
                                 <i data-lucide="calendar" style="width: 16px; height: 16px;"></i>
                                 Lihat Jadwal
