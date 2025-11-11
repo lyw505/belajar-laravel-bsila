@@ -29,31 +29,39 @@ Route::get('/login', [adminController::class, 'formLogin'])->name('login');
 
 Route::post('/login', [adminController::class, 'prosesLogin'])->name('login.post');
 
-Route::get('/home', [siswaController::class, 'home'])->name('home');
-
-Route::get('/siswa/create', [siswaController::class, 'create'])->name('siswa.create');
-
-Route::post('/siswa/store', [siswaController::class, 'store'])->name('siswa.store');
-
-Route::get('/siswa/{id}/edit', [siswaController::class, 'edit'])->name('siswa.edit');
-
-Route::put('siswa/{id}/update', [SiswaController::class, 'update'])->name('siswa.update');
-
-
-Route::get('/siswa/{id}/delete', [siswaController::class, 'destroy'])->name('siswa.delete');
-
-Route::get('/logout', [adminController::class, 'logout'])->name('logout');
-
 Route::get('/register', [adminController::class, 'formRegister'])->name('register.form');
 
 Route::post('/register', [adminController::class, 'prosesRegister'])->name('register.post');
 
-Route::get('/detil/{id}', [KontenController::class, 'detil'])->name('detil');
-
-Route::get('/jadwal', [kbmController::class, 'index'])->name('jadwal.index');
-
-Route::get('/jadwal/guru/{idguru}', [KbmController::class, 'jadwalGuru'])->name('jadwal.guru');
-
-Route::get('/jadwal/kelas/{idwalas}', [KbmController::class, 'jadwalKelas'])->name('jadwal.kelas');
+// Protected routes with ceklogin middleware
+Route::middleware(['ceklogin'])->group(function () {
+    Route::get('/home', [siswaController::class, 'home'])->name('home');
+    
+    Route::get('/siswa/data', [siswaController::class, 'getData'])->name('siswa.data');
+    
+    Route::get('/siswa/search', [siswaController::class, 'search'])->name('siswa.search');
+    
+    Route::get('/siswa/create', [siswaController::class, 'create'])->name('siswa.create');
+    
+    Route::post('/siswa/store', [siswaController::class, 'store'])->name('siswa.store');
+    
+    Route::get('/siswa/{id}/edit', [siswaController::class, 'edit'])->name('siswa.edit');
+    
+    Route::put('siswa/{id}/update', [SiswaController::class, 'update'])->name('siswa.update');
+    
+    Route::get('/siswa/{id}/delete', [siswaController::class, 'destroy'])->name('siswa.delete');
+    
+    Route::get('/logout', [adminController::class, 'logout'])->name('logout');
+    
+    Route::get('/detil/{id}', [KontenController::class, 'detil'])->name('detil');
+    
+    Route::get('/jadwal', [kbmController::class, 'index'])->name('jadwal.index');
+    
+    Route::get('/jadwal/data', [kbmController::class, 'getData'])->name('jadwal.data');
+    
+    Route::get('/jadwal/guru/{idguru}', [KbmController::class, 'jadwalGuru'])->name('jadwal.guru');
+    
+    Route::get('/jadwal/kelas/{idwalas}', [KbmController::class, 'jadwalKelas'])->name('jadwal.kelas');
+});
 
 

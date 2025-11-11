@@ -170,10 +170,17 @@
                             </a>
                         @endif
                     </div>
+                    <div style="margin-top: var(--spacing-4);">
+                        <label style="font-weight: 500; margin-bottom: var(--spacing-2); display: block;">
+                            <i data-lucide="search" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i>
+                            Cari Siswa:
+                        </label>
+                        <input type="text" id="search" class="form-control" placeholder="Ketik nama siswa..." style="max-width: 400px;">
+                    </div>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table">
+                        <table id="tabel-siswa" class="table">
                             <thead>
                                 <tr>
                                     <th style="width: 60px;">No</th>
@@ -198,36 +205,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($daftarSiswa as $i => $s)
-                                    <tr>
-                                        <td style="font-weight: 500; color: var(--gray-600);">{{ $i + 1 }}</td>
-                                        <td style="font-weight: 500;">{{ $s->nama }}</td>
-                                        <td>{{ $s->tb }}</td>
-                                        <td>{{ $s->bb }}</td>
-                                        @if(session('admin_role') === 'admin')
-                                            <td>
-                                                <div class="d-flex gap-2">
-                                                    <a href="{{ route('siswa.edit', $s->idsiswa) }}" class="btn btn-sm btn-outline" title="Edit Siswa">
-                                                        <i data-lucide="edit" style="width: 14px; height: 14px;"></i>
-                                                    </a>
-                                                    <a href="{{ route('siswa.delete', $s->idsiswa) }}" 
-                                                       class="btn btn-sm btn-danger" 
-                                                       title="Hapus Siswa"
-                                                       onclick="return confirm('Yakin ingin menghapus siswa {{ $s->nama }}?')">
-                                                        <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        @endif
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="{{ session('admin_role') === 'admin' ? '5' : '4' }}" class="text-center" style="padding: var(--spacing-8); color: var(--gray-500);">
-                                            <i data-lucide="users" style="width: 48px; height: 48px; display: block; margin: 0 auto var(--spacing-4) auto; opacity: 0.5;"></i>
-                                            Belum ada data siswa
-                                        </td>
-                                    </tr>
-                                @endforelse
+                                <!-- Data will be loaded via AJAX -->
                             </tbody>
                         </table>
                     </div>
@@ -236,4 +214,92 @@
         </div>
     </div>
 @endif
+
+@push('scripts')
+<script>
+$(document).ready(function(){
+    const isAdmin = '{{ session("admin_role") }}' === 'admin';
+    
+    function renderTable(data) {
+        let rows = '';
+        if (data.length === 0) {
+            rows = `<tr><td colspan="${isAdmin ? '5' : '4'}" class="text-center" style="padding: var(--spacing-8); color: var(--gray-500);">
+                        <i data-lucide="users" style="width: 48px; height: 48px; display: block; margin: 0 auto var(--spacing-4) auto; opacity: 0.5;"></i>
+                        Tidak ada data siswa ditemukan
+                    </td></tr>`;
+        } else {
+            data.forEach((s, index) => {
+                rows += `
+                    <tr>
+                        <td style="font-weight: 500; color: var(--gray-600);">${index + 1}</td>
+                        <td style="font-weight: 500;">${s.nama}</td>
+                        <td>${s.tb}</td>
+                        <td>${s.bb}</td>`;
+                
+                if (isAdmin) {
+                    rows += `
+                        <td>
+                            <div class="d-flex gap-2">
+                                <a href="/siswa/${s.idsiswa}/edit" class="btn btn-sm btn-outline" title="Edit Siswa">
+                                    <i data-lucide="edit" style="width: 14px; height: 14px;"></i>
+                                </a>
+                                <a href="/siswa/${s.idsiswa}/delete" 
+                                   class="btn btn-sm btn-danger" 
+                                   title="Hapus Siswa"
+                                   onclick="return confirm('Yakin ingin menghapus siswa ${s.nama}?')">
+                                    <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                                </a>
+                            </div>
+                        </td>`;
+                }
+                
+                rows += `</tr>`;
+            });
+        }
+        $('#tabel-siswa tbody').html(rows);
+        // Reinitialize Lucide icons for dynamically added content
+        lucide.createIcons();
+    }
+
+    function loadSiswa() {
+        $.ajax({
+            url: "{{ route('siswa.data') }}",
+            method: "GET",
+            success: function(response) {
+                renderTable(response);
+            },
+            error: function() {
+                alert('Gagal memuat data siswa.');
+            }
+        });
+    }
+
+    function searchSiswa(keyword) {
+        $.ajax({
+            url: "{{ route('siswa.search') }}",
+            method: "GET",
+            data: { q: keyword },
+            success: function(response) {
+                renderTable(response);
+            },
+            error: function() {
+                console.error('Gagal mencari data siswa.');
+            }
+        });
+    }
+
+    $('#search').on('keyup', function() {
+        const keyword = $(this).val().trim();
+        if (keyword.length > 0) {
+            searchSiswa(keyword);
+        } else {
+            loadSiswa();
+        }
+    });
+
+    // Load data on page load
+    loadSiswa();
+});
+</script>
+@endpush
 @endsection

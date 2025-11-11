@@ -8,16 +8,19 @@ use App\Models\kbm;
 use Illuminate\Http\Request;
 use App\Models\Siswa;
 use Illuminate\Support\Facades\DB;
+use App\Services\SiswaService;
+use App\Http\Requests\StoreSiswaRequest;
 
 class SiswaController extends Controller
 {
+    protected $service;
+
+    public function __construct(SiswaService $service)
+    {
+        $this->service = $service;
+    }
     public function home()
     {
-        // Kalau belum login
-        if (!session()->has('admin_id')) {
-            return redirect()->route('login');
-        }
-
         $siswa = null;
         $guru = null;
         $daftarSiswa = collect();
@@ -127,32 +130,10 @@ class SiswaController extends Controller
         return view('siswa.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreSiswaRequest $request)
     {
-        $request->validate([
-            'username' => 'required|unique:dataadmin,username',
-            'password' => 'required',
-            'nama' => 'required|string|max:100',
-            'tb' => 'required|integer',
-            'bb' => 'required|integer',
-        ]);
-
-        // Simpan user ke tabel dataadmin
-        $id = DB::table('dataadmin')->insertGetId([
-            'username' => $request->username,
-            'password' => bcrypt($request->password),
-            'role' => 'siswa',
-        ]);
-
-        // Simpan ke tabel datasiswa
-        Siswa::create([
-            'nama' => $request->nama,
-            'tb' => $request->tb,
-            'bb' => $request->bb,
-            'admin_id' => $id,
-        ]);
-
-        return redirect()->route('home')->with('success', 'Data siswa berhasil ditambahkan.');
+        $this->service->createSiswa($request->validated());
+        return redirect()->route('home')->with('success', 'Data siswa berhasil ditambahkan!');
     }
 
     public function destroy($id)
@@ -177,5 +158,69 @@ class SiswaController extends Controller
         $siswa = Siswa::find(session('admin_id')); // kalau login sebagai siswa
 
         return view('home', compact('jadwals', 'daftarSiswa', 'guru', 'siswa'));
+    }
+
+    public function getData()
+    {
+        $role = session('admin_role');
+        
+        if ($role === 'admin') {
+            $siswa = Siswa::all();
+        } elseif ($role === 'guru') {
+            // Ambil data guru dan idwalas
+            $guru = DB::table('dataadmin')
+                ->join('dataguru', 'dataadmin.id', '=', 'dataguru.id')
+                ->leftJoin('datawalas', 'dataguru.idguru', '=', 'datawalas.idguru')
+                ->where('dataadmin.id', session('admin_id'))
+                ->select('datawalas.idwalas')
+                ->first();
+            
+            if ($guru && $guru->idwalas) {
+                $siswa = DB::table('datasiswa')
+                    ->join('datakelas', 'datasiswa.idsiswa', '=', 'datakelas.idsiswa')
+                    ->where('datakelas.idwalas', $guru->idwalas)
+                    ->select('datasiswa.*')
+                    ->get();
+            } else {
+                $siswa = collect();
+            }
+        } else {
+            $siswa = collect();
+        }
+        
+        return response()->json($siswa);
+    }
+
+    public function search(Request $request)
+    {
+        $keyword = strtolower($request->input('q'));
+        $role = session('admin_role');
+        
+        if ($role === 'admin') {
+            $siswa = Siswa::whereRaw('LOWER(nama) LIKE ?', ["%{$keyword}%"])->get();
+        } elseif ($role === 'guru') {
+            // Ambil data guru dan idwalas
+            $guru = DB::table('dataadmin')
+                ->join('dataguru', 'dataadmin.id', '=', 'dataguru.id')
+                ->leftJoin('datawalas', 'dataguru.idguru', '=', 'datawalas.idguru')
+                ->where('dataadmin.id', session('admin_id'))
+                ->select('datawalas.idwalas')
+                ->first();
+            
+            if ($guru && $guru->idwalas) {
+                $siswa = DB::table('datasiswa')
+                    ->join('datakelas', 'datasiswa.idsiswa', '=', 'datakelas.idsiswa')
+                    ->where('datakelas.idwalas', $guru->idwalas)
+                    ->whereRaw('LOWER(datasiswa.nama) LIKE ?', ["%{$keyword}%"])
+                    ->select('datasiswa.*')
+                    ->get();
+            } else {
+                $siswa = collect();
+            }
+        } else {
+            $siswa = collect();
+        }
+        
+        return response()->json($siswa);
     }
 }

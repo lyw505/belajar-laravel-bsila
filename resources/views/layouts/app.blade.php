@@ -9,6 +9,9 @@
     <!-- Theme CSS -->
     <link rel="stylesheet" href="{{ asset('css/theme.css') }}">
     
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
     <!-- Icons (Lucide Icons) -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
     
