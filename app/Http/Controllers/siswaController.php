@@ -145,6 +145,20 @@ class SiswaController extends Controller
 
         return redirect()->route('home')->with('success', 'Data siswa berhasil dihapus.');
     }
+    public function getData()
+    {
+        $siswa = Siswa::all();
+        return response()->json($siswa);
+    }
+
+    public function search(Request $request)
+    {
+        $keyword = strtolower($request->input('q'));
+        $siswa = Siswa::whereRaw('LOWER(nama) LIKE ?', ["%{$keyword}%"])
+                    ->get();
+        return response()->json($siswa);
+    }
+
     public function index()
     {
         // Ambil semua jadwal lengkap dengan guru, walas, kelas

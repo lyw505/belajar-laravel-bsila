@@ -173,7 +173,8 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table">
+                        <p><label>Cari Siswa: </label><input type="text" id="search" placeholder="Ketik nama..." style="padding: 8px 12px; border: 1px solid var(--gray-300); border-radius: var(--radius-md); margin-bottom: 16px;"></p>
+                        <table class="table" id="tabel-siswa">
                             <thead>
                                 <tr>
                                     <th style="width: 60px;">No</th>
@@ -198,36 +199,6 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($daftarSiswa as $i => $s)
-                                    <tr>
-                                        <td style="font-weight: 500; color: var(--gray-600);">{{ $i + 1 }}</td>
-                                        <td style="font-weight: 500;">{{ $s->nama }}</td>
-                                        <td>{{ $s->tb }}</td>
-                                        <td>{{ $s->bb }}</td>
-                                        @if(session('admin_role') === 'admin')
-                                            <td>
-                                                <div class="d-flex gap-2">
-                                                    <a href="{{ route('siswa.edit', $s->idsiswa) }}" class="btn btn-sm btn-outline" title="Edit Siswa">
-                                                        <i data-lucide="edit" style="width: 14px; height: 14px;"></i>
-                                                    </a>
-                                                    <a href="{{ route('siswa.delete', $s->idsiswa) }}" 
-                                                       class="btn btn-sm btn-danger" 
-                                                       title="Hapus Siswa"
-                                                       onclick="return confirm('Yakin ingin menghapus siswa {{ $s->nama }}?')">
-                                                        <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        @endif
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="{{ session('admin_role') === 'admin' ? '5' : '4' }}" class="text-center" style="padding: var(--spacing-8); color: var(--gray-500);">
-                                            <i data-lucide="users" style="width: 48px; height: 48px; display: block; margin: 0 auto var(--spacing-4) auto; opacity: 0.5;"></i>
-                                            Belum ada data siswa
-                                        </td>
-                                    </tr>
-                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -236,4 +207,86 @@
         </div>
     </div>
 @endif
+
+<script>
+$(document).ready(function(){
+    function renderTable(data) {
+        let rows = '';
+        if (data.length === 0) {
+            const colspan = "{{ session('admin_role') === 'admin' ? '5' : '4' }}";
+            rows = `<tr><td colspan="${colspan}" class="text-center" style="padding: var(--spacing-8); color: var(--gray-500);"><i data-lucide="users" style="width: 48px; height: 48px; display: block; margin: 0 auto var(--spacing-4) auto; opacity: 0.5;"></i>Tidak ada data ditemukan</td></tr>`;
+        } else {
+            data.forEach((s, index) => {
+                let actions = '';
+                @if(session('admin_role') === 'admin')
+                actions = `
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a href="/siswa/${s.idsiswa}/edit" class="btn btn-sm btn-outline" title="Edit Siswa">
+                                <i data-lucide="edit" style="width: 14px; height: 14px;"></i>
+                            </a>
+                            <a href="/siswa/${s.idsiswa}/delete" 
+                               class="btn btn-sm btn-danger" 
+                               title="Hapus Siswa"
+                               onclick="return confirm('Yakin ingin menghapus siswa ${s.nama}?')">
+                                <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                            </a>
+                        </div>
+                    </td>
+                `;
+                @endif
+                rows += `
+                    <tr>
+                        <td style="font-weight: 500; color: var(--gray-600);">${index + 1}</td>
+                        <td style="font-weight: 500;">${s.nama}</td>
+                        <td>${s.tb}</td>
+                        <td>${s.bb}</td>
+                        ${actions}
+                    </tr>
+                `;
+            });
+        }
+        $('#tabel-siswa tbody').html(rows);
+        lucide.createIcons();
+    }
+
+    function loadSiswa() {
+        $.ajax({
+            url: "{{ route('siswa.data') }}",
+            method: "GET",
+            success: function(response) {
+                renderTable(response);
+            },
+            error: function() {
+                alert('Gagal memuat data siswa.');
+            }
+        });
+    }
+
+    function searchSiswa(keyword) {
+        $.ajax({
+            url: "{{ route('siswa.search') }}",
+            method: "GET",
+            data: { q: keyword },
+            success: function(response) {
+                renderTable(response);
+            },
+            error: function() {
+                console.error('Gagal mencari data siswa.');
+            }
+        });
+    }
+
+    loadSiswa();
+
+    $('#search').on('keyup', function() {
+        const keyword = $(this).val().trim();
+        if (keyword.length > 0) {
+            searchSiswa(keyword);
+        } else {
+            loadSiswa();
+        }
+    });
+});
+</script>
 @endsection

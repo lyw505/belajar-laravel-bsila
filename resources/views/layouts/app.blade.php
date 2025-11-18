@@ -11,6 +11,9 @@
     
     <!-- Icons (Lucide Icons) -->
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
     @stack('styles')
 </head>

@@ -41,6 +41,10 @@ Route::put('siswa/{id}/update', [SiswaController::class, 'update'])->name('siswa
 
 Route::get('/siswa/{id}/delete', [siswaController::class, 'destroy'])->name('siswa.delete')->middleware('cekadmin');
 
+Route::get('/siswa/data', [SiswaController::class, 'getData'])->name('siswa.data')->middleware('ceklogin');
+
+Route::get('/siswa/search', [SiswaController::class, 'search'])->name('siswa.search')->middleware('ceklogin');
+
 Route::get('/logout', [adminController::class, 'logout'])->name('logout');
 
 Route::get('/register', [adminController::class, 'formRegister'])->name('register.form');
