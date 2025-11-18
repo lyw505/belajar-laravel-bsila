@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\KontenController;
 use App\Http\Controllers\adminController;
 use App\Http\Controllers\SiswaController;
+use App\Http\Controllers\GuruController;
 use App\Models\siswa;
 
 /*
@@ -34,6 +35,10 @@ Route::get('/home', [siswaController::class, 'home'])->name('home')->middleware(
 Route::get('/siswa/create', [siswaController::class, 'create'])->name('siswa.create')->middleware('cekadmin');
 
 Route::post('/siswa/store', [siswaController::class, 'store'])->name('siswa.store')->middleware('cekadmin');
+
+Route::get('/guru/create', [GuruController::class, 'create'])->name('guru.create');
+
+Route::post('/guru/store', [GuruController::class, 'store'])->name('guru.store');
 
 Route::get('/siswa/{id}/edit', [siswaController::class, 'edit'])->name('siswa.edit')->middleware('cekadmin');
 

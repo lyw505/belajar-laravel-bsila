@@ -74,8 +74,6 @@ class AdminController extends Controller
                 'username'  => 'required|unique:dataadmin,username',
                 'password'  => 'required',
                 'role'      => 'required',
-                'nama_guru' => 'required_if:role,guru',
-                'mapel'     => 'required_if:role,guru',
                 'nama'      => 'required_if:role,siswa',
                 'tb'        => 'required_if:role,siswa',
                 'bb'        => 'required_if:role,siswa',
@@ -87,15 +85,6 @@ class AdminController extends Controller
                 'password' => bcrypt($request->password),
                 'role'     => $request->role,
             ]);
-
-            // Kalau role guru, simpan ke tabel dataguru
-            if ($request->role === 'guru') {
-                DB::table('dataguru')->insert([
-                    'id'    => $id, // FK ke dataadmin.id
-                    'nama'  => $request->nama_guru,
-                    'mapel' => $request->mapel,
-                ]);
-            }
 
             // Kalau role siswa, simpan ke tabel datasiswa
             if ($request->role === 'siswa') {

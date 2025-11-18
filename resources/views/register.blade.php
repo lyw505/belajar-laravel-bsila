@@ -109,46 +109,6 @@
                         </div>
                     </div>
 
-                    <!-- Additional Fields for Guru -->
-                    <div id="guru-fields" style="display: none;">
-                        <div style="border-top: 1px solid var(--gray-200); padding-top: var(--spacing-5); margin-top: var(--spacing-5);">
-                            <h5 style="color: var(--gray-800); margin-bottom: var(--spacing-4);">
-                                <i data-lucide="user-check" style="width: 18px; height: 18px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i>
-                                Data Guru
-                            </h5>
-                            
-                            <div class="form-group">
-                                <label for="nama_guru" class="form-label">
-                                    <i data-lucide="user" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i>
-                                    Nama Lengkap
-                                </label>
-                                <input 
-                                    type="text" 
-                                    id="nama_guru"
-                                    name="nama_guru" 
-                                    class="form-control" 
-                                    placeholder="Masukkan nama lengkap guru"
-                                    value="{{ old('nama_guru') }}"
-                                >
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="mapel" class="form-label">
-                                    <i data-lucide="book-open" style="width: 16px; height: 16px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i>
-                                    Mata Pelajaran
-                                </label>
-                                <input 
-                                    type="text" 
-                                    id="mapel"
-                                    name="mapel" 
-                                    class="form-control" 
-                                    placeholder="Contoh: Matematika, Bahasa Indonesia"
-                                    value="{{ old('mapel') }}"
-                                >
-                            </div>
-                        </div>
-                    </div>
-
                     <!-- Additional Fields for Siswa -->
                     <div id="siswa-fields" style="display: none;">
                         <div style="border-top: 1px solid var(--gray-200); padding-top: var(--spacing-5); margin-top: var(--spacing-5);">
@@ -238,14 +198,18 @@
 @push('scripts')
 <script>
     function showChoice(role) {
+        // Jika user memilih guru, redirect ke guru registration
+        if (role === 'guru') {
+            window.location.href = "{{ route('guru.create') }}";
+            return;
+        }
+
         // Hide all additional fields first
         document.getElementById('guru-fields').style.display = 'none';
         document.getElementById('siswa-fields').style.display = 'none';
 
         // Show fields based on selected role
-        if (role === 'guru') {
-            document.getElementById('guru-fields').style.display = 'block';
-        } else if (role === 'siswa') {
+        if (role === 'siswa') {
             document.getElementById('siswa-fields').style.display = 'block';
         }
     }
