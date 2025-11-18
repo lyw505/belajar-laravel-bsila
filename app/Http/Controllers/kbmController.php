@@ -71,7 +71,9 @@ class kbmController extends Controller
                   })
                   ->orWhereHas('walas', function($walasQuery) use ($search) {
                       $walasQuery->where('jenjang', 'like', "%{$search}%")
-                                 ->orWhere('namakelas', 'like', "%{$search}%");
+                                 ->orWhere('namakelas', 'like', "%{$search}%")
+                                 ->orWhereRaw("LOWER(CONCAT(REPLACE(jenjang, ' ', ''), REPLACE(namakelas, ' ', ''))) LIKE ?", [strtolower("%" . str_replace(' ', '', str_replace('-', '', $search)) . "%")])
+                                 ->orWhereRaw("LOWER(CONCAT(jenjang, '-', namakelas)) LIKE ?", [strtolower("%{$search}%")]);
                   });
             });
         }
@@ -155,7 +157,9 @@ class kbmController extends Controller
                   })
                   ->orWhereHas('walas', function($walasQuery) use ($search) {
                       $walasQuery->where('jenjang', 'like', "%{$search}%")
-                                 ->orWhere('namakelas', 'like', "%{$search}%");
+                                 ->orWhere('namakelas', 'like', "%{$search}%")
+                                 ->orWhereRaw("LOWER(CONCAT(REPLACE(jenjang, ' ', ''), REPLACE(namakelas, ' ', ''))) LIKE ?", [strtolower("%" . str_replace(' ', '', str_replace('-', '', $search)) . "%")])
+                                 ->orWhereRaw("LOWER(CONCAT(jenjang, '-', namakelas)) LIKE ?", [strtolower("%{$search}%")]);
                   });
             });
         }
