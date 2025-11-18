@@ -8,9 +8,17 @@ use App\Models\kbm;
 use Illuminate\Http\Request;
 use App\Models\Siswa;
 use Illuminate\Support\Facades\DB;
+use App\Services\SiswaService;
+use App\Http\Requests\StoreSiswaRequest;
 
 class SiswaController extends Controller
 {
+    protected $service;
+
+    public function __construct(SiswaService $service)
+    {
+        $this->service = $service;
+    }
     public function home()
     {
         $siswa = null;
@@ -110,32 +118,11 @@ class SiswaController extends Controller
         return view('siswa.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreSiswaRequest $request)
     {
-        $request->validate([
-            'username' => 'required|unique:dataadmin,username',
-            'password' => 'required',
-            'nama' => 'required|string|max:100',
-            'tb' => 'required|integer',
-            'bb' => 'required|integer',
-        ]);
+        $this->service->createSiswa($request->validated());
 
-        // Simpan user ke tabel dataadmin
-        $id = DB::table('dataadmin')->insertGetId([
-            'username' => $request->username,
-            'password' => bcrypt($request->password),
-            'role' => 'siswa',
-        ]);
-
-        // Simpan ke tabel datasiswa
-        Siswa::create([
-            'nama' => $request->nama,
-            'tb' => $request->tb,
-            'bb' => $request->bb,
-            'admin_id' => $id,
-        ]);
-
-        return redirect()->route('home')->with('success', 'Data siswa berhasil ditambahkan.');
+        return redirect()->route('home')->with('success', 'Data siswa berhasil ditambahkan!');
     }
 
     public function destroy($id)
