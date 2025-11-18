@@ -83,20 +83,12 @@ class SiswaController extends Controller
 
     public function edit($id)
     {
-        if (session('admin_role') !== 'admin') {
-            return redirect()->route('home')->with('error', 'Akses ditolak');
-        }
-
         $siswa = Siswa::findOrFail($id);
         return view('siswa.edit', compact('siswa'));
     }
 
     public function update(Request $request, $id)
     {
-        if (session('admin_role') !== 'admin') {
-            return redirect()->route('home')->with('error', 'Akses ditolak');
-        }
-
         $request->validate([
             'nama' => 'required|string|max:100',
             'tb' => 'required|integer',
@@ -115,10 +107,6 @@ class SiswaController extends Controller
 
     public function create()
     {
-        if (session('admin_role') !== 'admin') {
-            return redirect()->route('home')->with('error', 'Akses ditolak');
-        }
-
         return view('siswa.create');
     }
 
@@ -152,10 +140,6 @@ class SiswaController extends Controller
 
     public function destroy($id)
     {
-        if (session('admin_role') !== 'admin') {
-            return redirect()->route('home')->with('error', 'Akses ditolak');
-        }
-
         $siswa = Siswa::findOrFail($id);
         $siswa->delete();
 

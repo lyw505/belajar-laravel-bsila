@@ -31,16 +31,15 @@ Route::post('/login', [adminController::class, 'prosesLogin'])->name('login.post
 
 Route::get('/home', [siswaController::class, 'home'])->name('home')->middleware('ceklogin');
 
-Route::get('/siswa/create', [siswaController::class, 'create'])->name('siswa.create');
+Route::get('/siswa/create', [siswaController::class, 'create'])->name('siswa.create')->middleware('cekadmin');
 
-Route::post('/siswa/store', [siswaController::class, 'store'])->name('siswa.store');
+Route::post('/siswa/store', [siswaController::class, 'store'])->name('siswa.store')->middleware('cekadmin');
 
-Route::get('/siswa/{id}/edit', [siswaController::class, 'edit'])->name('siswa.edit');
+Route::get('/siswa/{id}/edit', [siswaController::class, 'edit'])->name('siswa.edit')->middleware('cekadmin');
 
-Route::put('siswa/{id}/update', [SiswaController::class, 'update'])->name('siswa.update');
+Route::put('siswa/{id}/update', [SiswaController::class, 'update'])->name('siswa.update')->middleware('cekadmin');
 
-
-Route::get('/siswa/{id}/delete', [siswaController::class, 'destroy'])->name('siswa.delete');
+Route::get('/siswa/{id}/delete', [siswaController::class, 'destroy'])->name('siswa.delete')->middleware('cekadmin');
 
 Route::get('/logout', [adminController::class, 'logout'])->name('logout');
 
@@ -50,7 +49,7 @@ Route::post('/register', [adminController::class, 'prosesRegister'])->name('regi
 
 Route::get('/detil/{id}', [KontenController::class, 'detil'])->name('detil');
 
-Route::get('/jadwal', [kbmController::class, 'index'])->name('jadwal.index');
+Route::get('/jadwal', [kbmController::class, 'index'])->name('jadwal.index')->middleware('ceklogin');
 
 Route::get('/jadwal/guru/{idguru}', [KbmController::class, 'jadwalGuru'])->name('jadwal.guru');
 

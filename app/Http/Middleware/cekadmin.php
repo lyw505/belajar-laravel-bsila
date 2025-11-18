@@ -5,12 +5,12 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 
-class ceklogin
+class cekadmin
 {
     public function handle(Request $request, Closure $next)
     {
-        if (!session()->has('admin_id')) {
-            return redirect()->route('login');
+        if (session('admin_role') !== 'admin') {
+            return redirect()->route('home')->with('error', 'Akses ditolak');
         }
 
         return $next($request);
