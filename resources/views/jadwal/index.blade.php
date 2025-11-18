@@ -152,8 +152,8 @@
                                         Kelas
                                     </th>
                                     <th>
-                                        <i data-lucide="users" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i>
-                                        Siswa
+                                        <i data-lucide="book-open" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i>
+                                        Mata Pelajaran
                                     </th>
                                 @elseif($role === 'admin' && $adminViewMode === 'siswa')
                                     <th>
@@ -195,14 +195,8 @@
                                             @endif
                                         </td>
                                         <td>
-                                            @php($murids = collect(optional($jadwal->walas)->kelas ?? [])->map(function($k){ return optional($k->siswa)->nama; })->filter()->values())
-                                            @if($murids->isNotEmpty())
-                                                <div style="display: flex; align-items: center; gap: var(--spacing-2);">
-                                                    <span class="badge badge-secondary">{{ $murids->count() }} siswa</span>
-                                                    <span class="text-muted" style="font-size: var(--font-size-xs);" title="{{ $murids->join(', ') }}">
-                                                        {{ Str::limit($murids->join(', '), 30) }}
-                                                    </span>
-                                                </div>
+                                            @if(data_get($jadwal, 'guru.mapel'))
+                                                <span class="badge badge-warning">{{ data_get($jadwal, 'guru.mapel') }}</span>
                                             @else
                                                 <span class="text-muted">-</span>
                                             @endif
