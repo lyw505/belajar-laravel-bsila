@@ -29,7 +29,7 @@ Route::get('/login', [adminController::class, 'formLogin'])->name('login');
 
 Route::post('/login', [adminController::class, 'prosesLogin'])->name('login.post');
 
-Route::get('/home', [siswaController::class, 'home'])->name('home');
+Route::get('/home', [siswaController::class, 'home'])->name('home')->middleware('ceklogin');
 
 Route::get('/siswa/create', [siswaController::class, 'create'])->name('siswa.create');
 

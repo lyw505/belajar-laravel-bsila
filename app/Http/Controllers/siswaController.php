@@ -13,11 +13,6 @@ class SiswaController extends Controller
 {
     public function home()
     {
-        // Kalau belum login
-        if (!session()->has('admin_id')) {
-            return redirect()->route('login');
-        }
-
         $siswa = null;
         $guru = null;
         $daftarSiswa = collect();
