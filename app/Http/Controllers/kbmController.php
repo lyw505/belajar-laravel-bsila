@@ -95,4 +95,76 @@ class kbmController extends Controller
         return view('jadwal.kelas', compact('kelas'));
     }
 
+    public function searchKbm(Request $request)
+    {
+        $role = session('admin_role');
+        $with = ['guru', 'walas'];
+
+        // Admin bisa memilih tampilan (guru/siswa)
+        if ($role === 'admin') {
+            $adminView = $request->get('view', 'guru');
+            if ($adminView === 'guru') {
+                $with = ['guru', 'walas.kelas.siswa'];
+            } else {
+                $with = ['guru', 'walas'];
+            }
+        }
+
+        // Mulai query dasar
+        $query = \App\Models\Kbm::query()->with($with);
+
+        // Jika role adalah guru, filter berdasarkan guru yang sedang login
+        if ($role === 'guru') {
+            $guru = \App\Models\Guru::where('id', session('admin_id'))->first();
+            if ($guru) {
+                $query->where('idguru', $guru->idguru);
+            } else {
+                $query->whereRaw('1 = 0');
+            }
+        }
+        // Jika role adalah siswa, filter berdasarkan kelas (idwalas) siswa yang login
+        elseif ($role === 'siswa') {
+            $siswa = \App\Models\Siswa::where('admin_id', session('admin_id'))->first();
+            if ($siswa) {
+                $kelas = \App\Models\Kelas::where('idsiswa', $siswa->idsiswa)->first();
+                if ($kelas) {
+                    $query->where('idwalas', $kelas->idwalas);
+                } else {
+                    $query->whereRaw('1 = 0');
+                }
+            } else {
+                $query->whereRaw('1 = 0');
+            }
+        } elseif ($role === 'admin') {
+            // Admin: dukung filter Hari
+            if ($request->filled('hari')) {
+                $query->where('hari', $request->get('hari'));
+            }
+        }
+
+        // Filter search
+        if ($request->filled('search')) {
+            $search = $request->get('search');
+            $query->where(function($q) use ($search) {
+                $q->where('hari', 'like', "%{$search}%")
+                  ->orWhere('mulai', 'like', "%{$search}%")
+                  ->orWhere('selesai', 'like', "%{$search}%")
+                  ->orWhereHas('guru', function($guruQuery) use ($search) {
+                      $guruQuery->where('nama', 'like', "%{$search}%")
+                                ->orWhere('mapel', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('walas', function($walasQuery) use ($search) {
+                      $walasQuery->where('jenjang', 'like', "%{$search}%")
+                                 ->orWhere('namakelas', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        $jadwals = $query->get();
+        return response()->json([
+            'jadwals' => $jadwals,
+            'adminView' => ($role === 'admin') ? $request->get('view', 'guru') : null,
+        ]);
+    }
+
 }

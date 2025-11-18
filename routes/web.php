@@ -55,6 +55,8 @@ Route::get('/detil/{id}', [KontenController::class, 'detil'])->name('detil');
 
 Route::get('/jadwal', [kbmController::class, 'index'])->name('jadwal.index')->middleware('ceklogin');
 
+Route::get('/jadwal/search', [kbmController::class, 'searchKbm'])->name('jadwal.search')->middleware('ceklogin');
+
 Route::get('/jadwal/guru/{idguru}', [KbmController::class, 'jadwalGuru'])->name('jadwal.guru');
 
 Route::get('/jadwal/kelas/{idwalas}', [KbmController::class, 'jadwalKelas'])->name('jadwal.kelas');
