@@ -173,7 +173,18 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <p><label>Cari Siswa: </label><input type="text" id="search" placeholder="Ketik nama..." style="padding: 8px 12px; border: 1px solid var(--gray-300); border-radius: var(--radius-md); margin-bottom: 16px;"></p>
+                        <div class="d-flex align-items-center justify-content-between" style="padding: 16px; padding-bottom: 0;">
+                            <label for="search" class="form-label mb-0" style="margin-right: 12px; font-weight: 500; color: var(--gray-700);">
+                                Cari Siswa
+                            </label>
+                            <input
+                                type="text"
+                                id="search"
+                                placeholder="Ketik nama..."
+                                class="form-control"
+                                style="max-width: 260px;"
+                            >
+                        </div>
                         <table class="table" id="tabel-siswa">
                             <thead>
                                 <tr>

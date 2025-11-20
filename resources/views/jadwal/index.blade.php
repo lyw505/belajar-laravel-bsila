@@ -64,23 +64,8 @@
                             </div>
                         </div>
 
-                        @if(session('admin_role') === 'admin')
-                        <!-- View Mode for Admin -->
-                        <div class="col-3" style="padding: 0 var(--spacing-2);">
-                            <div class="form-group">
-                                <label for="view" class="form-label">
-                                    Tampilan
-                                </label>
-                                <select id="view" name="view" class="form-control form-select">
-                                    <option value="guru" {{ ($adminView ?? request('view','guru')) === 'guru' ? 'selected' : '' }}>Role Guru</option>
-                                    <option value="siswa" {{ ($adminView ?? request('view')) === 'siswa' ? 'selected' : '' }}>Role Siswa</option>
-                                </select>
-                            </div>
-                        </div>
-                        @endif
-
                         <!-- Day Filter with Action Buttons -->
-                        <div class="{{ session('admin_role') === 'admin' ? 'col-3' : 'col-6' }}" style="padding: 0 var(--spacing-2);">
+                        <div class="col-4" style="padding: 0 var(--spacing-2);">
                             <div class="form-group">
                                 <label for="filter-hari" class="form-label">
                                     Hari
@@ -111,13 +96,21 @@
         <div class="card slide-up">
             <div class="card-header">
                 <div class="d-flex align-items-center justify-content-between">
-                    <h3 class="card-title">
-                        <i data-lucide="clock" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i>
-                        Daftar Jadwal Pelajaran
-                    </h3>
-                    <div class="text-muted" style="font-size: var(--font-size-sm);">
-                        Total: <strong>{{ count($jadwals) }}</strong> jadwal
+                    <div>
+                        <h3 class="card-title">
+                            <i data-lucide="clock" style="width: 20px; height: 20px; display: inline-block; vertical-align: middle; margin-right: 8px;"></i>
+                            Daftar Jadwal Pelajaran
+                        </h3>
+                        <div class="text-muted" style="font-size: var(--font-size-sm);">
+                            Total: <strong>{{ count($jadwals) }}</strong> jadwal
+                        </div>
                     </div>
+                    @if(session('admin_role') === 'admin')
+                        <a href="{{ route('jadwal.create') }}" class="btn btn-primary">
+                            <i data-lucide="plus-circle" style="width: 16px; height: 16px;"></i>
+                            Tambah Jadwal KBM
+                        </a>
+                    @endif
                 </div>
             </div>
             <div class="card-body p-0">
@@ -141,28 +134,14 @@
                                     <i data-lucide="user-check" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i>
                                     Guru
                                 </th>
-                                @php($role = session('admin_role'))
-                                @php($adminViewMode = $adminView ?? request('view'))
-                                @if($role === 'admin' && $adminViewMode === 'guru')
-                                    <th>
-                                        <i data-lucide="school" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i>
-                                        Kelas
-                                    </th>
-                                    <th>
-                                        <i data-lucide="book-open" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i>
-                                        Mata Pelajaran
-                                    </th>
-                                @elseif($role === 'admin' && $adminViewMode === 'siswa')
-                                    <th>
-                                        <i data-lucide="book-open" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i>
-                                        Mata Pelajaran
-                                    </th>
-                                @else
-                                    <th>
-                                        <i data-lucide="{{ $role === 'siswa' ? 'book-open' : 'school' }}" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i>
-                                        {{ $role === 'siswa' ? 'Mata Pelajaran' : 'Kelas' }}
-                                    </th>
-                                @endif
+                                <th>
+                                    <i data-lucide="school" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i>
+                                    Kelas
+                                </th>
+                                <th>
+                                    <i data-lucide="book-open" style="width: 14px; height: 14px; display: inline-block; vertical-align: middle; margin-right: 6px;"></i>
+                                    Mata Pelajaran
+                                </th>
                             </tr>
                         </thead>
                         <tbody id="jadwal-tbody">
@@ -176,17 +155,8 @@
 
 <script>
 $(document).ready(function(){
-    const role = "{{ session('admin_role') }}";
-    const adminView = "{{ $adminView ?? request('view', 'guru') }}";
-
     function renderTable(data) {
-        const role = "{{ session('admin_role') }}";
-        const adminView = $('#view').val() || "{{ $adminView ?? request('view', 'guru') }}";
-        let colspan = 5;
-
-        if (role === 'admin' && adminView === 'guru') {
-            colspan = 6;
-        }
+        let colspan = 6;
 
         let rows = '';
         if (data.length === 0) {
@@ -203,45 +173,10 @@ $(document).ready(function(){
                 const mulai = jadwal.mulai || '-';
                 const selesai = jadwal.selesai || '-';
 
-                let extraColumn = '';
-                if (role === 'admin' && adminView === 'guru') {
-                    const kelasInfo = jadwal.walas ? (jadwal.walas.jenjang + ' ' + jadwal.walas.namakelas) : '-';
-                    const kelasDisplay = kelasInfo !== '-' ? `<span class="badge badge-success">${kelasInfo}</span>` : '<span class="text-muted">-</span>';
-                    const mapel = jadwal.guru ? jadwal.guru.mapel : '-';
-                    const mapelDisplay = mapel && mapel !== '-' ? `<span class="badge badge-warning">${mapel}</span>` : '<span class="text-muted">-</span>';
-                    extraColumn = `
-                        <td>
-                            ${kelasDisplay}
-                        </td>
-                        <td>
-                            ${mapelDisplay}
-                        </td>
-                    `;
-                } else if (role === 'admin' && adminView === 'siswa') {
-                    const mapel = jadwal.guru ? jadwal.guru.mapel : '-';
-                    const mapelDisplay = mapel && mapel !== '-' ? `<span class="badge badge-warning">${mapel}</span>` : '<span class="text-muted">-</span>';
-                    extraColumn = `
-                        <td>
-                            ${mapelDisplay}
-                        </td>
-                    `;
-                } else if (role === 'siswa') {
-                    const mapel = jadwal.guru ? jadwal.guru.mapel : '-';
-                    const mapelDisplay = mapel && mapel !== '-' ? `<span class="badge badge-warning">${mapel}</span>` : '<span class="text-muted">-</span>';
-                    extraColumn = `
-                        <td>
-                            ${mapelDisplay}
-                        </td>
-                    `;
-                } else {
-                    const kelasInfo = jadwal.walas ? (jadwal.walas.jenjang + ' ' + jadwal.walas.namakelas) : '-';
-                    const kelasDisplay = kelasInfo !== '-' ? `<span class="badge badge-success">${kelasInfo}</span>` : '<span class="text-muted">-</span>';
-                    extraColumn = `
-                        <td>
-                            ${kelasDisplay}
-                        </td>
-                    `;
-                }
+                const kelasInfo = jadwal.walas ? (jadwal.walas.jenjang + ' ' + jadwal.walas.namakelas) : '-';
+                const kelasDisplay = kelasInfo !== '-' ? `<span class="badge badge-success">${kelasInfo}</span>` : '<span class="text-muted">-</span>';
+                const mapel = jadwal.guru ? jadwal.guru.mapel : '-';
+                const mapelDisplay = mapel && mapel !== '-' ? `<span class="badge badge-warning">${mapel}</span>` : '<span class="text-muted">-</span>';
 
                 rows += `
                     <tr>
@@ -259,7 +194,12 @@ $(document).ready(function(){
                         <td style="font-weight: 500;">
                             ${guruNama}
                         </td>
-                        ${extraColumn}
+                        <td>
+                            ${kelasDisplay}
+                        </td>
+                        <td>
+                            ${mapelDisplay}
+                        </td>
                     </tr>
                 `;
             });
@@ -271,15 +211,13 @@ $(document).ready(function(){
     function loadJadwal() {
         const search = $('#search').val();
         const hari = $('#filter-hari').val();
-        const view = $('#view').val() || "{{ $adminView ?? request('view', 'guru') }}";
 
         $.ajax({
             url: "{{ route('jadwal.search') }}",
             method: "GET",
             data: {
                 search: search,
-                hari: hari,
-                view: view
+                hari: hari
             },
             success: function(response) {
                 renderTable(response.jadwals);
@@ -303,17 +241,11 @@ $(document).ready(function(){
         loadJadwal();
     });
 
-    // Event listener untuk view mode
-    $('#view').on('change', function() {
-        loadJadwal();
-    });
-
     // Event listener untuk reset button
     $('#resetBtn').on('click', function(e) {
         e.preventDefault();
         $('#search').val('');
         $('#filter-hari').val('');
-        $('#view').val('guru');
         loadJadwal();
     });
 });

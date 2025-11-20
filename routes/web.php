@@ -66,4 +66,8 @@ Route::get('/jadwal/guru/{idguru}', [KbmController::class, 'jadwalGuru'])->name(
 
 Route::get('/jadwal/kelas/{idwalas}', [KbmController::class, 'jadwalKelas'])->name('jadwal.kelas');
 
+Route::get('/jadwal/create', [kbmController::class, 'create'])->name('jadwal.create')->middleware('cekadmin');
+
+Route::post('/jadwal', [kbmController::class, 'store'])->name('jadwal.store')->middleware('cekadmin');
+
 
